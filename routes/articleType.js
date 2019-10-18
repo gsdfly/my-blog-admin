@@ -25,10 +25,20 @@ exports.delType = (req, res) => {
 };
 
 exports.getTypes = (req, res) => {
-    ArticleType.findAll().then((response)=>{
-        responseClient(res, 200, 0, '操作成功',{rows:response} );
-    }).catch((err)=>{
-        responseClient(res, 500, 0, '服务器错误',{err:err});
-    })
+    let {pageNo=1,pageSize=10,hasPage=1} = req.query;
+    if(hasPage==1){
+        ArticleType.findAndCountAll({offset:(pageNo-1)*pageSize,limit:pageSize}).then((response)=>{
+            responseClient(res,200,0,'操作成功',Object.assign({},response,{per_page:pageSize,current_page:pageNo}))
+        }).catch((err)=>{
+            responseClient(res, 500, 0, '服务器错误',{err:err});
+        })
+    }else {
+        ArticleType.findAll().then((response)=>{
+            responseClient(res, 200, 0, '操作成功', response);
+        }).catch((err)=>{
+            responseClient(res, 500, 0, '服务器错误',{err:err});
+        })
+    }
+
 };
 

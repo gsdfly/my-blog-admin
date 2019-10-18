@@ -4,7 +4,7 @@ const admin = require('./admin');
 const articleType = require('./articleType');
 const jwt = require('jsonwebtoken');
 const redis = require('redis');
-const {responseClient, timestampToTime, md5} = require('./../util/util');
+const {responseClient, timestampToTime, md5,getQnToken} = require('./../util/util');
 
 var router = express.Router();
 
@@ -29,6 +29,7 @@ router.use('/admin/*',function (req,res,next) {
           if (new Date().getTime() > obj.exp * 1000) {
             responseClient(res,401,'token已过期，请重新登录');
           }else {
+              req.body.admin_id = obj.id;
             next();
           }
         }
@@ -50,7 +51,8 @@ router.post('/admin/login', admin.login);
 router.get('/admin/logout',admin.logout)
 //用户
 router.post('/admin/addAdmin', admin.addAdmin);
-router.get('/admin/admins', admin.getAdmins);
+router.get('/admin/getAdmins', admin.getAdmins);
+router.post('/admin/delAdmin', admin.delAdmin);
 //文章
 router.get('/admin/getArticles',article.getArticles);
 router.get('/admin/getArticle',article.getArticle);
@@ -61,5 +63,10 @@ router.post('/admin/updateArticle',article.updateArticle);
 router.get('/admin/getTypes',articleType.getTypes);
 router.post('/admin/addType',articleType.addType);
 router.post('/admin/delType',articleType.delType);
+//七牛文件上传
+router.get('/admin/qiniuToken',function (req,res) {
+  let token = getQnToken();
+  responseClient(res,200,0,'操作成功',{token:token})
+});
 
 module.exports = router;

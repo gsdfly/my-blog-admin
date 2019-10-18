@@ -77,8 +77,9 @@ exports.addAdmin = (req, res) => {
 
 //获取用户列表
 exports.getAdmins = (req, res) =>{
-  Admin.findAll().then(response=>{
-      responseClient(res,200,0,'操作成功',{rows:response})
+    let {pageNo=1,pageSize=10} = req.query;
+  Admin.findAndCountAll({offset:((pageNo-1)*pageSize),limit:pageSize}).then(response=>{
+      responseClient(res,200,0,'操作成功',Object.assign({},response,{per_page:pageSize,current_page:pageNo}))
   }).catch((err)=>{
       responseClient(res, 500, 0, '服务器错误',{err:err});
   })

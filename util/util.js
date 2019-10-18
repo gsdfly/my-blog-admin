@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-
+const qiniu = require('qiniu')
 module.exports = {
 	MD5_SUFFIX: 'www.litianyu.top*&^%$#',
 	md5: function(pwd) {
@@ -25,4 +25,15 @@ module.exports = {
 		const s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
 		return Y + M + D + h + m + s;
 	},
+	 getQnToken() {
+		var accessKey = '7PNzMjYTxqp2TrSZ1FBx7GMT8C9lm55iPAF1ua9S';
+		var secretKey = 'KWSQuimbBYZmSmhvp-RlXheXZcZuiXqqxv5FAKoB';
+		var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+		var options = {
+			scope: 'ly-dev',
+		};
+		var putPolicy = new qiniu.rs.PutPolicy(options);
+		var uploadToken=putPolicy.uploadToken(mac);
+		return uploadToken
+	}
 };
